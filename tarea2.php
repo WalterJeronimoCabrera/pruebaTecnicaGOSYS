@@ -33,13 +33,15 @@ $ejemploDestinos1 =
 
 $ejemploDestinos2 = [
   [
-    "nombre" => "America", 
+    "nombre" => "America",
     "hijos" => [
       [
         "nombre" => "Argentina",
         "hijos" => [
           ["nombre" => "Buenos Aires"],
           ["nombre" => "Córdoba"],
+          ["nombre" => "Santa Fe"],
+          ["nombre" => "Santa Fe"],
           ["nombre" => "Santa Fe"]
         ],
       ],
@@ -47,7 +49,8 @@ $ejemploDestinos2 = [
         "nombre" => "EEUU",
         "hijos" => [
           ["nombre" => "Arizona"],
-          ["nombre" => "Florida"]
+          ["nombre" => "Florida"],
+          ["nombre" => "Santa Fe"],
         ]
       ]
     ]
@@ -57,25 +60,60 @@ $ejemploDestinos2 = [
       "hijos" => [
           ["nombre" => "España"],
           ["nombre" => "Italia"],
+          ["nombre" => "Santa Fe"],
+          ["nombre" => "Santa Fe"],    
       ]
   ]
 ];
 
-function buscarDestinos(array $destinos, string $substring):array {
-  $coincidencias = array();
+function buscarDestinos(array $destinos, string $substring) {
+
+  $coincidenciasParciales = array();
+
   foreach ($destinos as $key => $value) {
-    foreach ($value as $eslavon => $valor) {
-      if ($eslavon == "nombre"){
-        if($valor == $substring){
-          $coincidencias[] = $valor;
+    foreach ($value as $clave => $valor) {
+      if ($clave == "nombre"){
+        // if($valor == $substring){
+        //   echo'verdad';echo '<br><br>';
+        //   $coincidenciasParciales[] = $valor;
+        // }else{
+        //   echo'mentira';echo '<br><br>';
+        // }
+        //print_r($valor); echo 'desde nombre';echo '<br><br>';
+        }elseif ($clave == "hijos") {
+          buscarDestinos($valor, $substring);
         }
-      }elseif ($eslavon == "hijos") {
-        buscarDestinos($valor, $substring);
-      }
     }
   }
-    return $destinos;
 }
 
-//ej
-$coincidencias = buscarDestinos($ejemploDestinos2, "ar"); //["Argentina", "Arizona"]
+function recorrerArbol($arbol, $array){
+  foreach ($arbol as $key => $value) {
+    foreach ($value as $clave => $valor) {
+      if ($clave == "nombre"){
+        echo $valor; echo '<br><br>';
+      }elseif ($clave == "hijos") {
+          recorrerArbol($valor, $array);
+        }
+    }
+  }
+}
+
+
+function imprimirArray(Array $array){
+  foreach ($array as $key => $value) {
+    echo $value;
+  }
+}
+// function recortando(string $buscado, string $comparacion){
+//   //$tamaño = count($buscado);
+//   $tamanio = $buscado::length();
+
+// }
+
+//recortando("ar", "argentina");
+// buscarDestinos($ejemploDestinos2, "Santa Fe"); //["Argentina", "Arizona"]
+print_r(buscarDestinos($ejemploDestinos2, "Santa Fe"));
+$array = array();
+$jero = recorrerArbol($ejemploDestinos2,$array);
+print_r($jero);
