@@ -40,3 +40,31 @@ let facturas = [{
             {subtotal: 9674.95, descripcion: 'qwerty'}
     ]}
 ];
+posicion = 0;
+tamanio = facturas.length;
+var deudaB2C = 0;
+var deudaB3C = 0;
+
+function buscarDeudas(posicion){
+    if (posicion < tamanio) {
+        if(!facturas[posicion].pagada){
+            if(facturas[posicion].cliente.tipo == "B2C"){
+                deudaB2C +=  facturas[posicion].items.subtotal.sum;
+            }if (facturas[posicion].cliente.tipo == "B3B") {
+                deudaB3C +=  facturas[posicion].items.subtotal.sum;
+            }
+        }
+        posicion += 1;
+        buscarDeudas(posicion);
+    }
+}
+
+var deudaTotal = facturas.map(function(x){
+    if(!x.pagada){
+        return x.items.sum(function(y){
+            return y.subtotal;
+        })
+    }
+});
+
+console.log(deudaTotal);

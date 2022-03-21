@@ -4,13 +4,13 @@
         var string $patente;
         var HojaDeRuta $hojaDeRuta;
 
-        public function __construct(Modelo $modelo, string $patente){
-            $this->modelo = $modelo;
+        public function __construct(Float $volumenMax, Float $pesoMax, string $patente){
+            $this->modelo = new Modelo($volumenMax, $pesoMax);
             $this->patente = $patente;
         }
 
         public function asignarHojaDeRuta(HojaDeRuta $hoja){
-            if ($this->seLePuedeAsignar($hoja)) {
+            if ($this->modelo->puedeHacerEstaRuta($hoja)) {
                 $this->hojaDeRuta = $hoja;
                 echo 'se asigno';
             }else{
@@ -18,14 +18,8 @@
             }
         }
 
-        public function seLePuedeAsignar(HojaDeRuta $hoja):bool{
-            if($hoja->volumen() < $this->modelo->volumenMaximo()
-                && $hoja->peso() < $this->modelo->pesoMaximo()){
-                    return true;
-            }else{return false;}
-        }
         public function calcularCostoPorHojaDeViaje(HojaDeRuta $hoja){
-            
+            return $hoja->calcularCosto();
         }
     }
 
@@ -38,16 +32,13 @@
             $this->pesoMax = $pesoMax;
         }
 
-        public function pesoMaximo():float{
-            return $this->pesoMax;
-        }
-
-        public function volumenMaximo():float{
-            return $this->volumenMax;
+        public function puedeHacerEstaRuta(HojaDeRuta $hoja):Bool{
+            return $hoja->peso() < $this->pesoMax && $hoja->volumen() < $this->volumenMax ;
         }
     }
 
     class HojaDeRuta{
+
         var array $viajes;
         var float $pesoTotal;
         var float $volumenTotal;
@@ -96,11 +87,12 @@
     class Viaje{
         var Lugar $origen;
         var Lugar $destino;
-        var Paquete $paquetes;
+        var mixed $paquetes;
 
-        public function __construct(Lugar $origen, Lugar $destino){
+        public function __construct(Lugar $origen, Lugar $destino, mixed $paquetes){
             $this->origen = $origen;
             $this->destino = $destino;
+            $this->paquetes = $paquetes;
         }
 
         public function asignarPaquetes(Paquete $paquete)
@@ -135,19 +127,11 @@
         }
     }
 
-    class Normal{
+    class Normal extends Viaje{
 
-        var $origen;
-        var Lugar $destino;
-
-        public function __construct( $origen, lugar $destino){
-            $this->origen = $origen;
-            $this->destino = $destino;
+        public function calcularCosto():Float{
+            return 2 * $this->peso() * $this->distancia();
         }
-
-        // public function calcularCosto():Float{
-        //     return 2 * $this->peso() * $this->distancia();
-        // }
     }
 
     class Prioritario extends Viaje{
@@ -217,22 +201,6 @@
         }
     }
 
-    //modelos
-    $mb710 = new Modelo(2500,6000);
-
-    //camiones
-    $camion = new Camion($mb710, "mgt 532");
-
-    //viajes
-    $aVillaRosa = new Viaje(new Lugar("ruta 25", 25, 25.25, 2525.25), new Lugar("ruta 25", 25, 25.25, 2525.25));
-    // $aRusia = new Prioritario($centralDeCarga, $rusia);
-    // $aCentralDeCarga = new Devolucion($rusia, $centralDeCarga, $array1);
-
-    //hojas De Rutas
-    // $hojaDeRuta2 = new HojaDeRuta([$aRusia, $aCentralDeCarga]);
-    // $hojaDeRuta1 = new HojaDeRuta([$hojaDeRuta2, $aVillaRosa]);
-    // $rutaExpress = new HojaDeRuta([$aVillaRosa]);
-
     //paquetes
     $celular = new Paquete(250,0.14,0.05,0.02);
     $pecera = new Paquete(2.250,0.85,0.40,1.1);
@@ -247,7 +215,19 @@
     $rusia = new Lugar("dahka", 2525, 25525, 21);
     $centralDeCarga = new Lugar("ruta 25", 25, 25.25, 2525.25);
 
-    // echo($camion->asignarHojaDeRuta($hojaDeRuta2));
-    // echo($aVillaRosa->distancia());
-    print_r($aVillaRosa->origen);
+    //viajes
+    $aVillaRosa = new Normal($centralDeCarga, $villaRosa, $array1);
+    $aRusia = new Prioritario($centralDeCarga, $rusia, $array2);
+    $aCentralDeCarga = new Devolucion($rusia, $centralDeCarga, $array1);
+
+    //hojas De Rutas
+    $hojaDeRuta2 = new HojaDeRuta([$aRusia, $aCentralDeCarga]);
+    $hojaDeRuta1 = new HojaDeRuta([$hojaDeRuta2, $aVillaRosa]);
+    $rutaExpress = new HojaDeRuta([$aVillaRosa]);
+
+    //camiones
+    $camion = new Camion(2500, 6000, "mgt 532");
+
+    $camion->asignarHojaDeRuta($hojaDeRuta2);
+    $camion->calcularCostoPorHojaDeViaje($hojaDeRuta2);
 ?>
