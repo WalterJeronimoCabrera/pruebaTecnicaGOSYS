@@ -67,24 +67,28 @@ $ejemploDestinos2 = [
 ];
 
 function buscarDestinos(array $destinos, string $substring) {
-
-  $coincidenciasParciales = array();
-
+  $coincidencias = array();
   foreach ($destinos as $key => $value) {
     foreach ($value as $clave => $valor) {
       if ($clave == "nombre"){
-        // if($valor == $substring){
-        //   echo'verdad';echo '<br><br>';
-        //   $coincidenciasParciales[] = $valor;
-        // }else{
-        //   echo'mentira';echo '<br><br>';
-        // }
-        //print_r($valor); echo 'desde nombre';echo '<br><br>';
+        if(esResultadoValido($valor, $substring)){
+          $coincidencias[] = $valor;
+        }
         }elseif ($clave == "hijos") {
-          buscarDestinos($valor, $substring);
+          $agregar = buscarDestinos($valor, $substring);
+          $coincidencias = array_merge($coincidencias, $agregar);
         }
     }
   }
+  return $coincidencias;
+}
+
+function esResultadoValido($buscado, $buscando):Bool{
+  $buscado = strtolower($buscado);
+  $buscando = strtolower($buscando);
+  if (strpos($buscado,$buscando) !== false) {
+    return true;
+  }else{return false;}
 }
 
 function recorrerArbol($arbol, $array){
@@ -102,18 +106,18 @@ function recorrerArbol($arbol, $array){
 
 function imprimirArray(Array $array){
   foreach ($array as $key => $value) {
-    echo $value;
+    echo $value;echo', ';
   }
 }
-// function recortando(string $buscado, string $comparacion){
-//   //$tamaño = count($buscado);
-//   $tamanio = $buscado::length();
 
-// }
+$coincidencias = buscarDestinos($ejemploDestinos2, "san"); //["Argentina", "Arizona"]
+imprimirArray($coincidencias);
 
-//recortando("ar", "argentina");
-// buscarDestinos($ejemploDestinos2, "Santa Fe"); //["Argentina", "Arizona"]
-print_r(buscarDestinos($ejemploDestinos2, "Santa Fe"));
-$array = array();
-$jero = recorrerArbol($ejemploDestinos2,$array);
-print_r($jero);
+// $array = array();
+// $jero = recorrerArbol($ejemploDestinos2,$array);
+// print_r($jero);
+
+// buscarDestinos()
+
+
+
